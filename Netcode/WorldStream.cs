@@ -16,7 +16,6 @@ namespace OpenEQ.Netcode {
 		string SessionKey;
 
 		public WorldStream(string host, int port, uint accountID, string sessionKey) : base(host, port) {
-			//Debug = true;
 			AccountID = accountID;
 			SessionKey = sessionKey;
 			WriteLine("Starting world connection...");

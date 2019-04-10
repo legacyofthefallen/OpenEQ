@@ -26,7 +26,9 @@ namespace OpenEQ.Engine {
 
 		public void Bind() {
 			if(Current == Id) return;
+#if DEBUG
 			Debug.Assert(!Destroyed);
+#endif
 			GL.BindVertexArray(Id);
 			Current = Id;
 		}

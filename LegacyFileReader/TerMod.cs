@@ -20,11 +20,12 @@ namespace OpenEQ.LegacyFileReader {
 			var br = new BinaryReader(fp, Encoding.Default, leaveOpen: true);
 
 			var magic = br.ReadUInt32();
+#if DEBUG
 			if(isTer)
 				Debug.Assert(magic == 0x54475145); // 'EQGT'
 			else
 				Debug.Assert(magic == 0x4d475145); // 'EQGM'
-			
+#endif   
 			var version = br.ReadUInt32();
 			var strlen = br.ReadInt32();
 			var numMat = br.ReadInt32();

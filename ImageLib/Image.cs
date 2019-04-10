@@ -23,14 +23,18 @@ namespace ImageLib {
 			Data = data;
 			PixelBytes = PixelSize(ColorMode);
 			Stride = Size.Width * PixelBytes;
+#if DEBUG
 			Debug.Assert(Data.Length == PixelBytes * Size.Width * Size.Height);
+#endif
 			Name = name;
 		}
 
 		public Image(ColorMode colorMode, (int Width, int Height) size, uint[] data, string name = null) {
 			ColorMode = colorMode;
 			Size = size;
+#if DEBUG
 			Debug.Assert(data.Length == Size.Width * Size.Height);
+#endif
 			Data = new byte[size.Width * size.Height * PixelSize(colorMode)];
 			Buffer.BlockCopy(data, 0, Data, 0, 4 * size.Width * size.Height);
 			Name = name;

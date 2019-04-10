@@ -55,7 +55,9 @@ namespace OpenEQ.Engine {
 		}
 
 		public void Bind() {
+#if DEBUG
 			Debug.Assert(!Destroyed);
+#endif
 			GL.BindBuffer(Target, Object);
 		}
 	}

@@ -21,9 +21,13 @@ namespace OpenEQ.LegacyFileReader {
 			var br = new BinaryReader(fp, Encoding.Default, leaveOpen: true);
 
 			var magic = br.ReadUInt32();
+#if DEBUG
 			Debug.Assert(magic == 0x5a475145); // 'EQGZ'
+#endif
 			var version = br.ReadUInt32();
+#if DEBUG
 			Debug.Assert(version == 1);
+#endif
 			var strlen = br.ReadInt32();
 			var numFiles = br.ReadInt32();
 			var numPlaceable = br.ReadInt32();

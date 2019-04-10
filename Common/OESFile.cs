@@ -39,7 +39,9 @@ namespace OpenEQ.Common {
 			Children.Where(x => x is T1 || x is T2 || x is T3);
 
 		internal void Serialize(BinaryWriter bw) {
+#if DEBUG
 			Debug.Assert(TypeCode.Length <= 4);
+#endif
 			bw.Write(Encoding.ASCII.GetBytes(TypeCode + "    ".Substring(TypeCode.Length)));
 			bw.Write(Id);
 
@@ -99,14 +101,16 @@ namespace OpenEQ.Common {
 			file.Add(instance);
 			instance.OESFile = file;
 			instance.DeserializeData(br);
+#if DEBUG
 			Debug.Assert(br.BaseStream.Position <= epos);
+#endif
 			br.BaseStream.Position = epos;
 
 			for(var i = 0; i < numChildren; ++i)
 				instance.Add(Deserialize(file, br));
-			
+#if DEBUG
 			Debug.Assert(br.BaseStream.Position == epos + cdlen);
-
+#endif
 			return instance;
 		}
 
@@ -506,7 +510,9 @@ namespace OpenEQ.Common {
 		internal void Resolve<T>(uint id, Action<T> func) where T : OESChunk {
 			if(!Resolvers.ContainsKey(id)) Resolvers[id] = new List<Action<OESChunk>>();
 			Resolvers[id].Add(chunk => {
+#if DEBUG
 				Debug.Assert(chunk is T);
+#endif
 				func((T) chunk);
 			});
 		}
