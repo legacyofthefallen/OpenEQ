@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Ionic.Zlib;
+using System.IO.Compression;
 using static OpenEQ.Netcode.Utility;
 
 namespace OpenEQ.Netcode {
@@ -53,7 +53,7 @@ namespace OpenEQ.Netcode {
                     if(!combined && stream.Compressing) {
                         if(packet[off] == 0x5a) {
 							using(var ms = new MemoryStream(packet, 3, packet.Length - 3 - 2)) {
-								using(var ds = new ZlibStream(ms, CompressionMode.Decompress)) {
+								using(var ds = new GZipStream(ms, CompressionMode.Decompress)) {
 									using(var tms = new MemoryStream()) {
 										ds.CopyTo(tms);
 										packet = tms.ToArray();
@@ -153,7 +153,7 @@ namespace OpenEQ.Netcode {
 
                 if(doCompress && stream.Compressing) {
                     using(var ms = new MemoryStream()) {
-                        using(var ds = new ZlibStream(ms, CompressionMode.Compress)) {
+                        using(var ds = new GZipStream(ms, CompressionMode.Compress)) {
                             ds.Write(Baked, 2, off - 2);
                             ds.Flush();
                         }
