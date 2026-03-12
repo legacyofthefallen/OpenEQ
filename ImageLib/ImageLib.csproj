@@ -6,7 +6,6 @@
   <ItemGroup>
     <PackageReference Include="Be.IO-netstandard" Version="1.0.3" />
     <PackageReference Include="Crc32.NET" Version="1.2.0" />
-    <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0006" />
   </ItemGroup>
 </Project>

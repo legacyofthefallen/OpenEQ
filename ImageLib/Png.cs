@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Be.IO;
 using Force.Crc32;
-using Ionic.Zlib;
+using System.IO.Compression;
 
 namespace ImageLib {
 	public static class Png {
@@ -52,11 +52,10 @@ namespace ImageLib {
 			for(var y = 0; y < image.Size.Height; ++y)
 				Array.Copy(image.Data, y * stride, imem, y * stride + y + 1, stride);
 			using(var ms = new MemoryStream()) {
-				using(var ds = new ZlibStream(ms, CompressionMode.Compress, CompressionLevel.BestSpeed, leaveOpen: true)) {
+				using (var ds = new GZipStream(ms, CompressionLevel.Fastest, leaveOpen: true))
+				{
 					ds.Write(imem, 0, imem.Length);
-					ds.Flush();
 				}
-				ms.Flush();
 				WriteChunk("IDAT", ms.ToArray());
 			}
 
@@ -109,7 +108,7 @@ namespace ImageLib {
 
 			var idata = idats.SelectMany(x => x).ToArray();
 			using(var ms = new MemoryStream())
-				using(var zs = new ZlibStream(ms, CompressionMode.Decompress)) {
+				using(var zs = new GZipStream(ms, CompressionMode.Decompress)) {
 					zs.Write(idata, 0, idata.Length);
 					zs.Flush();
 					ms.Flush();
