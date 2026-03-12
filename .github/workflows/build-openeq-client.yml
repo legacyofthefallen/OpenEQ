@@ -26,5 +26,8 @@ jobs:
         run: nuget restore OpenEQ.sln
       - name: Build solution
         run: dotnet build OpenEQ.sln
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '6.0.x'
       - name: Test solution
         run: dotnet test
