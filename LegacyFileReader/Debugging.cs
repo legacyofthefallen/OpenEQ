@@ -1,6 +1,7 @@
 ﻿using static System.Console;
-
+#if DEBUG
 namespace OpenEQ.LegacyFileReader {
+
 	public static class Debugging {
 		static string Escape(string v) => v.Replace("&", "&amp;").Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;");
 		public static void OutputHTML(Wld wld) {
@@ -10,3 +11,4 @@ namespace OpenEQ.LegacyFileReader {
 		}
 	}
 }
+#endif

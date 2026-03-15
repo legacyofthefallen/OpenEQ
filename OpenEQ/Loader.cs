@@ -49,7 +49,9 @@ namespace OpenEQ {
 						yield return elem;
 					yield break;
 				}
+#if DEBUG
 				Debug.Assert(Matrix4x4.Invert(mat, out var imat));
+#endif
 				for(var i = 0; i < buffer.Count; i += 8) {
 					var vert = Vector3.Transform(new Vector3(buffer[i + 0], buffer[i + 1], buffer[i + 2]), mat);
 					var normal = Vector3.Transform(new Vector3(buffer[i + 3], buffer[i + 4], buffer[i + 5]), imat);

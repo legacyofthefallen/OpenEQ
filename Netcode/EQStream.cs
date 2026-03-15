@@ -5,7 +5,6 @@ using static OpenEQ.Netcode.Utility;
 
 namespace OpenEQ.Netcode {
 	public abstract class EQStream {
-		public bool Debug = false;
 
 		public bool Compressing, Validating;
 		public byte[] CRCKey;
@@ -65,16 +64,18 @@ namespace OpenEQ.Netcode {
 							if(packet == null || packet.Acked)
 								break;
 							if(Time.Now - packet.SentTime > 2) {
-								if(Debug)
-									WriteLine(
+#if DEBUG
+								WriteLine(
 										$"Packet {packet.Sequence} not acked in {Time.Now - packet.SentTime}; resending.");
+#endif
 								Send(packet);
 							}
 						}
 
 						if(lastAckSent != InSequence) {
-							if(Debug)
-								WriteLine($"ACKing up to {(ushort) ((InSequence + 65536 - 1) % 65536)}");
+#if DEBUG
+							WriteLine($"ACKing up to {(ushort) ((InSequence + 65536 - 1) % 65536)}");
+#endif
 							Send(Packet.Create(SessionOp.Ack, sequence: (ushort) ((InSequence + 65536 - 1) % 65536)));
 							lastAckSent = InSequence;
 						} else if(resendAck) {
@@ -96,18 +97,19 @@ namespace OpenEQ.Netcode {
 		async void ReceiverAsync() {
 			try {
 				while(!Disconnecting) {
-					if(Debug)
-						WriteLine($"Waiting for packets on wire ({this})");
+#if DEBUG
+					WriteLine($"Waiting for packets on wire ({this})");
+#endif
 					var data = await conn.Receive();
 					//ForegroundColor = ConsoleColor.Blue;
 					lastRecvSendTime = Time.Now;
 
-					if(Debug) {
+#if DEBUG
 						//ForegroundColor = ConsoleColor.DarkMagenta;
 						WriteLine($"Received packet ({this})");
 						Hexdump(data);
-						//ResetColor();
-					}
+					//ResetColor();
+#endif
 
 					var packet = new Packet(this, data);
 					if(packet.Valid)
@@ -154,8 +156,9 @@ namespace OpenEQ.Netcode {
 					QueueOrProcess(packet);
 					break;
 				case SessionOp.Combined:
-					if(Debug)
-						WriteLine("Processing combined packet: {");
+#if DEBUG
+					WriteLine("Processing combined packet: {");
+#endif
 					for(var i = 0; i < packet.Data.Length;) {
 						var slen = packet.Data[i];
 						var sub = new Packet(this, packet.Data.Sub(i + 1, i + 1 + slen), combined: true);
@@ -163,15 +166,15 @@ namespace OpenEQ.Netcode {
 						i += slen + 1;
 					}
 
-					if(Debug)
-						WriteLine("} END OF COMBINED");
+#if DEBUG
+					WriteLine("} END OF COMBINED");
+#endif
 					break;
 				default:
-					if(Debug) {
-						WriteLine($"Unknown packet received: {op} (0x{packet.Opcode:X04})");
+#if DEBUG
+					WriteLine($"Unknown packet received: {op} (0x{packet.Opcode:X04})");
 						Hexdump(packet.Data);
-					}
-
+#endif
 					break;
 			}
 		}
@@ -191,24 +194,25 @@ namespace OpenEQ.Netcode {
 				} else if((packet.Sequence < InSequence && InSequence - packet.Sequence < 2048) ||
 				          packet.Sequence - (InSequence + 65536) < 2048) {
 					// Past
-					if(Debug)
-						WriteLine(
+#if DEBUG
+					WriteLine(
 							$"Got packet in the past... expect {InSequence} got {packet.Sequence}.  Sending ACK up to {(ushort) ((InSequence + 65536) % 65536)}");
+#endif
 					resendAck = true;
 				}
 			}
 		}
 
 		void HandleAppPacketProxy(AppPacket packet) {
-			if(Debug) {
-				//ForegroundColor = ConsoleColor.Magenta;
-				WriteLine($"Received app packet (opcode {packet.Opcode:X04}, {this}):");
+#if DEBUG
+			//ForegroundColor = ConsoleColor.Magenta;
+			WriteLine($"Received app packet (opcode {packet.Opcode:X04}, {this}):");
 				if(packet.Data == null)
 					WriteLine("!Null data!");
 				else
 					Hexdump(packet.Data);
-				//ResetColor();
-			}
+			//ResetColor();
+#endif
 
 			HandleAppPacket(packet);
 		}
@@ -224,8 +228,9 @@ namespace OpenEQ.Netcode {
 					var app = new AppPacket(packet.Data);
 					HandleAppPacketProxy(app);
 					InSequence = (ushort) ((packet.Sequence + 1) % 65536);
-					if(Debug)
-						WriteLine($"Single packet updated sequence from {packet.Sequence} to {InSequence}");
+#if DEBUG
+					WriteLine($"Single packet updated sequence from {packet.Sequence} to {InSequence}");
+#endif
 					break;
 				case SessionOp.Fragment:
 					var tlen = packet.Data.NetU32(0);
@@ -251,9 +256,10 @@ namespace OpenEQ.Netcode {
 					}
 
 					InSequence = (ushort) ((last + 1) % 65536);
-					if(Debug)
-						WriteLine(
+#if DEBUG
+					WriteLine(
 							$"Fragmented packet updated our sequence from {packet.Sequence} to {InSequence} ({last - packet.Sequence} packets)");
+#endif
 					HandleAppPacketProxy(new AppPacket(tdata));
 					break;
 			}
@@ -280,12 +286,12 @@ namespace OpenEQ.Netcode {
 				Hexdump(data);
 			}
 
-			if(Debug) {
-				//ForegroundColor = ConsoleColor.DarkGreen;
-				WriteLine($"Sending connection packet (from {this}):");
+#if DEBUG
+			//ForegroundColor = ConsoleColor.DarkGreen;
+			WriteLine($"Sending connection packet (from {this}):");
 				Hexdump(data);
-				//ResetColor();
-			}
+			//ResetColor();
+#endif
 
 			conn.Send(data);
 		}
@@ -295,15 +301,15 @@ namespace OpenEQ.Netcode {
 				// Fragment
 				WriteLine("Fragment :(");
 			} else {
-				if(Debug) {
-					//ForegroundColor = ConsoleColor.Green;
-					WriteLine($"Sending app packet (opcode {packet.Opcode:X04}, {this}):");
+#if DEBUG
+				//ForegroundColor = ConsoleColor.Green;
+				WriteLine($"Sending app packet (opcode {packet.Opcode:X04}, {this}):");
 					if(packet.Data == null)
 						WriteLine("!Null data!");
 					else
 						Hexdump(packet.Data);
-					//ResetColor();
-				}
+				//ResetColor();
+#endif
 
 				var data = new byte[packet.Size];
 				data[1] = (byte) (packet.Opcode >> 8);

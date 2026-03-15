@@ -21,8 +21,9 @@ namespace OpenEQ.LegacyFileReader {
 
 			var offset = Br.ReadUInt32();
 			var magic = Br.ReadUInt32();
+#if DEBUG
 			Debug.Assert(magic == 0x20534650);
-
+#endif
 			fp.Position = offset;
 			var chunks = Enumerable.Range(0, Br.ReadInt32()).Select(
 				_ => (Crc: Br.ReadUInt32(), Offset: Br.ReadUInt32(), Size: Br.ReadUInt32())
@@ -35,7 +36,9 @@ namespace OpenEQ.LegacyFileReader {
 			using(var dms = new MemoryStream(dir)) {
 				using(var dbr = new BinaryReader(dms)) {
 					var fileCount = dbr.ReadUInt32();
+#if DEBUG
 					Debug.Assert(fileCount == chunks.Count);
+#endif
 					for(var i = 0; i < fileCount; ++i) {
 						var str = Encoding.ASCII.GetString(dbr.ReadBytes(dbr.ReadInt32())).TrimEnd('\0');
 						Files[str.ToLower()] = (chunks[i].Offset, chunks[i].Size);

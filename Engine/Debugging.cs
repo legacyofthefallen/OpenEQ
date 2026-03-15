@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
-
+#if DEBUG
 namespace OpenEQ.Engine {
 	public static class Debugging {
 		public static readonly List<Wireframe> Wireframes = new List<Wireframe>();
@@ -10,3 +10,4 @@ namespace OpenEQ.Engine {
 		public static void Draw(Matrix4x4 projView) => Wireframes.ForEach(wireframe => wireframe.Draw(projView));
 	}
 }
+#endif

@@ -201,7 +201,9 @@ namespace OpenEQ.LegacyFileReader {
 			Br = new BinaryReader(Fp);
 
 			var magic = Br.ReadUInt32();
+#if DEBUG
 			Debug.Assert(magic == 0x54503D02);
+#endif
 			NewFormat = Br.ReadUInt32() != 0x00015500;
 
 			var fragCount = Br.ReadUInt32();
@@ -267,7 +269,9 @@ namespace OpenEQ.LegacyFileReader {
 						WriteLine($"Unhandled fragment type 0x{type:X02}");
 						break;
 				}
+#if DEBUG
 				Debug.Assert(Fp.Position <= spos + size); // Make sure we didn't read past the end of a fragment
+#endif
 				Fp.Position = spos + size;
 			}
 		}

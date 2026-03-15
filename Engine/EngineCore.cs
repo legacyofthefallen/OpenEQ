@@ -287,9 +287,9 @@ namespace OpenEQ.Engine {
 				GL.DepthMask(true);
 				GL.Finish();
 			});
-			
+#if DEBUG
 			Debugging.Draw(ProjectionView);
-
+#endif
 			View.Update(Time);
 			View.Renderer.UpdateRenderTree();
 			View.Renderer.RenderOffscreen();

@@ -15,7 +15,9 @@ namespace ImageLib {
 			bw.Write(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A });
 
 			void WriteChunk(string type, byte[] data) {
+#if DEBUG
 				Debug.Assert(type.Length == 4);
+#endif
 				bw.Write(data.Length);
 				var td = Encoding.ASCII.GetBytes(type).Concat(data).ToArray();
 				bw.Write(td);
